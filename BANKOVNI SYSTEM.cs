@@ -1,14 +1,11 @@
 ﻿using System.Globalization;
 using System.Text.Json;
 
-// Do tohoto souboru se ukládají všechna data (účty, zůstatky, historie)
 string fileName = "accounts.json";
 
 // Seznam všech účtů v bance
 List<Account> accounts = new List<Account>();
 
-// Pokud už soubor existuje, načteme z něj účty.
-// Pokud ne (první spuštění), přidáme dva účty na zkoušku.
 if (File.Exists(fileName))
 {
   string json = File.ReadAllText(fileName);
@@ -22,7 +19,6 @@ else
 
 Console.WriteLine("Vítej v C# bance!");
 
-// Přihlášení - ptáme se tak dlouho, dokud uživatel něco nenapíše
 string loginName = "";
 while (loginName == "")
 {
@@ -30,13 +26,10 @@ while (loginName == "")
   loginName = (Console.ReadLine() ?? "").Trim();
 }
 
-// Hledáme účet se stejným jménem (velikost písmen nás nezajímá)
-// Account? znamená, že tam může být i nic (null), když účet nenajdeme
 Account? current = accounts.Find(a => a.Name.ToLower() == loginName.ToLower());
 
 if (current == null)
 {
-  // Takový účet ještě není, tak ho vytvoříme s nulovým zůstatkem
   current = new Account { Name = loginName, Balance = 0 };
   accounts.Add(current);
   Console.WriteLine("Byl vytvořen nový účet pro " + loginName);
@@ -142,11 +135,9 @@ while (running)
 
           if (transfer > 0 && transfer <= current.Balance)
           {
-            // Odesílateli peníze ubydou, příjemci přibydou
             current.Balance -= transfer;
             target.Balance += transfer;
 
-            // Zapíšeme to do historie obou účtů
             current.History.Add($"Odesláno {transfer:F2} uživateli {target.Name}");
             target.History.Add($"Přijato {transfer:F2} od uživatele {current.Name}");
 
@@ -185,18 +176,11 @@ while (running)
       Console.WriteLine("Neplatná volba!");
       break;
   }
-
-  // Po každé akci uložíme všechny účty do JSON souboru,
-  // takže o nic nepřijdeme, ani když program vypneme křížkem nebo stop tlačítkem.
-  // WriteIndented = true jen udělá, že je soubor pěkně čitelný.
+.
   string jsonToSave = JsonSerializer.Serialize(accounts, new JsonSerializerOptions { WriteIndented = true });
   File.WriteAllText(fileName, jsonToSave);
 }
 
-// Třída Account je takový návod, jak vypadá jeden účet.
-// Každý účet má jméno, zůstatek a seznam textů s historií.
-// decimal je číslo s desetinnou čárkou, které se hodí na peníze, protože počítá přesně.
-// { get; set; } je potřeba, aby to šlo uložit do JSON.
 class Account
 {
   public string Name { get; set; } = "";
