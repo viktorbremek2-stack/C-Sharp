@@ -1,2 +1,2 @@
 # C#
-Repository s mými jednoduchými projekty
+Jednoduché projekty
